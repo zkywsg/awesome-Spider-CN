@@ -3,11 +3,25 @@
 
 ### Bilibili
 
+### 百度指数
+
+### Twitter
+
+### 秀动
+
+
+
 <br/>
 
 ### Requests
 
+### Xpath
 
+### Re
+
+### BeautifulSoup
+
+### PyMysql
 
 ### Scrapy
 
@@ -30,6 +44,9 @@ scrapy startproject pro_name
 # 创建一个新的爬虫
 scrapy genspider [-t template] <name> <domain>
 scrapy genspider -d basic
+
+# 创建全站爬虫
+scrapy genspider -t crawl xxx www.xxx.com
 
 # 启动爬虫
 scrapy crawl spider_name
@@ -144,3 +161,45 @@ class MySpider(scrapy.Spider):
             yield scrapy.Request(url, callback=self.parse)
 ```
 
+```python
+# 全站爬虫crawlspider
+from scrapy.linkextractors import LinkExtractor
+from scrapy.spiders import CrawlSpider, Rule
+
+class xxxSpider(CrawlSpider):
+    name = 'xxx'
+    start_urls = ['http://www.xxx.com']
+    
+    # 链接提取器：根据指定规则进行指定链接的提取
+    link = LinkExtractor(allow=r'type=4&page=\d+')
+    # 规则解析器：讲链接提取器进行指定规则的解析操作==>callback函数
+    rules = (
+    	Rule(line,callback='parse_item',follow=True),
+    )
+    
+    def parse_item(self,response):
+        print(response)
+```
+
+- setting
+
+```python
+# 一些常见的setting
+```
+
+
+
+### scrapy-redis
+
+- 原生scrapy无法进行分布式爬虫，调度器和管道不能被分布式集群共享
+- 基本流程
+  - 创建一个工程文件
+  - 创建一个CrawlSpider的爬虫文件 
+  - 修改spider文件
+    - 添加：from scrapy_redis.spiders import RedisCrawlSpider
+    - 将start_urls和allowed_domains注释
+    - 添加新属性：redis_key = 'proname' 
+    - 写数据分析的操作
+    - 把爬虫父类改成RedisCrawlSpider
+
+### 异步爬虫
