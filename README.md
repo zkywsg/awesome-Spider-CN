@@ -15,6 +15,110 @@
 
 ### Requests
 
+- 发起http请求
+
+```python
+import requests
+# get请求
+r = requests.get('www.xxx.com')
+
+# post请求
+r = requests.post('www.xxx.com')
+```
+
+- 传递参数
+
+```python
+# params
+payload = {'key1':'value1', 'key2':'value2'}
+r = requests.get("www.xxx.com",params = payload)
+print(r.url)
+
+# 传递json
+import json
+url = 'https://api.github.com/some/endpoint'
+payload = {'some': 'data'}
+r = requests.post(url, data = json.dumps(payload))
+```
+
+- 查看响应内容
+
+```python
+import requests
+r = requests.get('https://api.github.com/events')
+r.encoding = 'ISO-8859-1'
+# 文本形式
+print(r.text)
+# 字节形式
+print(r.content)
+# 二进制创建图片
+from PIL import Image
+from io import BytesIO
+i = Image.open(BytesIO(r.content))
+# json形式
+print(r.json())
+# 原始数据
+print(r.raw)
+# 查看响应状态码
+print(r.status_code)
+```
+
+- 请求头相关
+
+```python
+# 定制响应头
+url = 'www.xxx.com'
+headers = {'user-agent': 'my-app/0.0.1'}
+r = requests.get(url, headers = headers)
+
+# 查看响应头
+r.headers
+>>>
+{
+    'content-encoding': 'gzip',
+    'transfer-encoding': 'chunked',
+    'connection': 'close',
+    'server': 'nginx/1.0.4',
+    'x-runtime': '148ms',
+    'etag': '"e1ca502697e5c9317743dc078f67693f"',
+    'content-type': 'application/json'
+}
+# 获取某个字段
+r.headers['Content-Type']
+r.headers.get('content-type')
+```
+
+- cookie
+
+```python
+# 发送cookies
+url = 'http://httpbin.org/cookies'
+cookies = dict(cookies_are = 'working')
+r = requests.get(url, cookies = cookies)
+r.text
+
+# cookie的返回对象是RequestCookieJar 可以传到Requests
+jar = requests.cookies.RequestsCookieJar()
+jar.set('tasty_cookie', 'yum', domain='httpbin.org', path='/cookies')
+url = 'http://httpbin.org/cookies'
+r = requests.get(url, cookies = jar)
+print(r.text)
+```
+
+- 重定向
+
+```python
+# history追踪
+import requests.get('http://github.com')
+print(r.url)
+print(r.history)
+
+# allow_redirects = False 参数取消
+r = requests.get('http://github.com', allow_redirects=False)
+```
+
+
+
 ### Xpath
 
 ### Re
@@ -192,7 +296,9 @@ class xxxSpider(CrawlSpider):
 ### scrapy-redis
 
 - 原生scrapy无法进行分布式爬虫，调度器和管道不能被分布式集群共享
+
 - 基本流程
+
   - 创建一个工程文件
   - 创建一个CrawlSpider的爬虫文件 
   - 修改spider文件
@@ -201,5 +307,57 @@ class xxxSpider(CrawlSpider):
     - 添加新属性：redis_key = 'proname' 
     - 写数据分析的操作
     - 把爬虫父类改成RedisCrawlSpider
+  - 修改配置文件settings
+    - 指定使用可以被共享的pipeline
+    - 指定调度器
+    - 指定redis服务器
+  - redis配置
+    - 修改redis.conf
+      - 注释bind 127.0.0.1
+      - 关闭 protected-mode no
+    - 开启服务
+      - redis-server 配置文件
+    - 启动客户端
+      - redis-cli
+  - 执行工程
+    - scrapy runspider xxx.py
+  - 向调度器的队列中放入一个起始url
+    - 调度器的队列在redis的客户端中
+      - lpush name url
+  -  数据存储到redis的proName:items
+
+  ```python
+  # 指定使用可以被共享的pipeline
+  ITEM_PIPELINES = {
+      'scrapy_redis.pipelines.RedisPipeline':400
+  }
+  
+  # 指定调度器
+  DUPEFILTER_CLASS = 'scrapy_redis.dupefilter.RFPDupeFilter'
+  SCHEDULER = 'scrapy_redis.scheduler.Scheduler'
+  SCHEDULER_PERSIST = True
+  
+  # 指定redis
+  REDIS_HOST = '127.0.0.1' # redis远程服务器的ip
+  REDIS_PORT = 8888
+  ```
+
+  
 
 ### 异步爬虫
+
+### 多进程/线程/协程爬虫
+
+### 增量式爬虫
+
+- 监控网站，爬取最新的数据。
+- 流程
+  - 指定一个起始URL
+  - 基于CrawlSpider获取其他页码链接
+  - 基于Rule进行链接的请求
+  - 从每一个页码对应的页面源码解析出URL请求然后解析和检测
+  - 进行存储
+  - 核心在于如何检测是否爬取存储过
+    - 可以使用redis中的set结构
+    - conn.sadd() 直到出现重复内容
+
