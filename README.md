@@ -117,6 +117,37 @@ print(r.history)
 r = requests.get('http://github.com', allow_redirects=False)
 ```
 
+- 会话
+
+```python
+# 会话可以在跨请求过程中保持某些参数。同一个Session实力发出的所有请求之间可以保持cookie
+import requests
+
+s = requests.Session()
+s.get('http://httpbin.org/cookies/set/sessioncookie/123456789')
+r = s.get("http://httpbin.org/cookies")
+print(r.text)
+
+# 方法级别的参数不会被跨请求保持
+s = requests.Session()
+r = s.get('http://httpbin.org/cookies', cookies={'from-my': 'browser'})
+# cookie存在
+print(r.text)
+# cookie空
+r = s.get('http://httpbin.org/cookies')
+print(r.text)
+
+# 使用上下文管理器
+with requests.Session() as s:
+    s.get('http://httpbin.org/cookies/set/sessioncookie/123456789')
+```
+
+- 超时timeout
+
+```python
+r = requests.get('https://github.com', timeout=5)
+```
+
 
 
 ### Xpath
