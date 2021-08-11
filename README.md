@@ -1,5 +1,8 @@
 # awesome-Spider-CN
+
 ### 微博
+
+### 知乎
 
 ### Bilibili
 
@@ -7,7 +10,6 @@
 
 ### Twitter
 
-### 秀动
 
 
 
@@ -391,4 +393,160 @@ class xxxSpider(CrawlSpider):
   - 核心在于如何检测是否爬取存储过
     - 可以使用redis中的set结构
     - conn.sadd() 直到出现重复内容
+
+
+
+### Mysql 
+
+- 常用指令
+
+```mysql
+# 连接mysql服务器
+mysql -u root -p
+# 退出mysql
+exit
+# 创建数据库
+CREATE DATABASE databaseName;
+# 删除数据库
+DROP DATABASE databaseName;
+# 选择数据库
+use databaseName;
+```
+
+
+
+- 在python中的常用操作
+
+```python
+import
+```
+
+
+
+
+
+### Selenium
+
+- 安装方式
+
+```shell
+pip install Selenium
+```
+
+- 需要安装chromedrive
+  - https://chromedriver.storage.googleapis.com/index.html?path=2.35/
+
+- 八种方式进行元素定位
+
+| 定位一个元素                      | 定位多个元素                       | 含义                  |
+| :-------------------------------- | ---------------------------------- | --------------------- |
+| find_element_by_id                | find_elements_by_id                | 通过id定位            |
+| find_element_by_name              | find_elements_by_name              | 通过name定位          |
+| find_element_by_xpath             | find_elements_by_xpath             | 通过xpath定位         |
+| find_element_by_link_text         | find_elements_by_link_text         | 通过超链接定位        |
+| find_element_by_partial_link_text | find_elements_by_partial_link_text | 通过部分链接定位      |
+| find_element_by_tag_name          | find_elements_by_tag_name          | 通过标签定位          |
+| find_element_by_class_name        | find_elements_by_class_name        | 通过类名进行定位      |
+| find_elements_by_css_selector     | find_elements_by_css_selector      | 通过css选择器进行定位 |
+
+- xpath的一些写法
+
+```python
+dr.find_element_by_xpath("//*[@id='xxx']")
+dr.find_element_by_xpath("//*[@name='xxx']")
+dr.find_element_by_xpath("//input[@class='xxx']")
+dr.find_element_by_xpath("//input[@id='xxx' and @name='xxx']")
+```
+
+- css的一些写法
+
+```python
+dr.find_element_by_css_selector("#xxx")
+dr.find_element_by_css_selector(".xxx")
+dr.find_element_by_css_selector("html > body > div > span")
+```
+
+- 操控浏览器的一些方式
+
+| 方法              | 说明                   |
+| ----------------- | ---------------------- |
+| set_window_side() | 设置浏览器的大小       |
+| back()            | 控制浏览器后退         |
+| forward()         | 控制浏览器向前         |
+| refresh()         | 刷新当前页面           |
+| clear()           | 清理文本               |
+| send_keys()       | 模拟按键输入           |
+| click()           | 单击元素               |
+| sumbit()          | 提交表单               |
+| get_attribute()   | 获取元素属性值         |
+| is_displayed()    | 设置该元素是否用户可见 |
+| size              | 返回元素尺寸           |
+| text              | 获取元素文本           |
+
+- 常用操作
+
+```python
+from selenium import webdriver
+# 创建浏览器
+driver = webdriver.Chrome(executable_path = "xxx\chromedrive")
+
+# 通过浏览器发送URL请求
+driver.get('www.baidu.com')
+
+# 设置浏览器大小
+driver.set_window_size(1400,800)
+
+# 打印当前title URL
+print(driver.title)
+print(driver.current_url)
+
+# 定位一组元素并遍历
+elements = driver.find_elements_by_xpath('//div/a')
+
+for e in elements:
+    print(e.text)
+
+# iframe切换
+driver.switch_to.frame('xxx')
+driver.switch_to.default_content()
+
+# 文件上传
+import os
+file_path = 'file:///' + os.path.abspath('upfile.html')
+driver.get(file_path)
+driver.find_element_by_name("file").send_keys('D:\\upload_file.txt')
+
+# 打印cookie
+print(driver.get_cookies)
+
+# 添加cookie
+dict = {'name':'xxx','value':'xxx'}
+driver.add_cookie(dict)
+
+# 遍历cookie
+for cookie in driver.get_cookies():
+    print(cookie['name'],cookie['value'])
+
+# 删除所有cookies
+driver.delete_all_cookies()
+
+# 关闭单个窗口
+driver.close()
+
+# 浏览器关闭
+driver.quit()
+```
+
+- 键盘事件
+
+| 模拟键盘按键                | 说明           |
+| --------------------------- | -------------- |
+| send_keys(Keys.BACK_SPACE)  | 删除键         |
+| send_keys(Keys.SPACE)       | 空格键         |
+| send_keys(Keys.TAB)         | 制表键         |
+| send_keys(Keys.ESCAPE)      | 回退键         |
+| send_keys(Keys.ENTER)       | 回车键         |
+| send_keys(Keys.CONTROL,‘a’) | 全选（Ctrl+A） |
+| send_keys(Keys.CONTROL,‘c’) | 复制（Ctrl+C） |
+| send_keys(Keys.CONTROL,‘x’) | 剪切（Ctrl+X） |
 
